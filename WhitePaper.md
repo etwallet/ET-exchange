@@ -76,11 +76,7 @@ Token作为可流通的加密数字权益证明，ETB是ET社区的权益证明�
 ### 2．社区治理
 ETB的持有者拥有社区治理权，作为一个分布式治理社区，社区成员投票（每人可投1票）选举出7名理事会成员，社区事务半年后将会从创始团队手中移交给理事会。
 ## （三）初始分配
-合伙人 5%（智能合约锁定一年时间内逐步解冻）<br>
-创始团队 10%（智能合约锁定一年时间内逐步解冻）<br>
-挖矿 10%<br>
-代币互换 74%<br>
-社区推广 1%<br>
+ ![image](https://github.com/eostoken/ET-exchange/blob/master/picture/rate.png)
 # 九、代币互换说明
 待定（将会在正式版本详细阐述）。
 # 十、资金用途
@@ -93,10 +89,8 @@ ETB的持有者拥有社区治理权，作为一个分布式治理社区，社�
 媒体推广<br>
 推进合规<br>
 # 十一、项目路线图
-1.代币互换<br>
-2.开放ETB交易<br>
-3.开放基于EOS的代币交易<br>
-4.支持BTC、ETH及其他币种的跨链交易<br>
-5.开放基于ESDT币币交易
-# 十二、运营主体
+ ![image](https://github.com/eostoken/ET-exchange/blob/master/picture/roadmap.png)
+# 十二、ET生态图
+ ![image](https://github.com/eostoken/ET-exchange/blob/master/picture/ecologic.png)
+# 十三、运营主体
 ET交易所由注册于维京群岛的Byte Master Technology Co.,Ltd公司负责合法合规的运营。
