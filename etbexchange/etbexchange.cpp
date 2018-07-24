@@ -3,20 +3,19 @@
  *  @copyright defined in eos/LICENSE.txt
  */
 
-#include "ico.h"
+#include "etbexchange.h"
 
 namespace etb {
 
-    const int64_t expire_time = 2*60;//40 * 24 * 3600;//40天众筹期
+    const int64_t expire_time = 40 * 24 * 3600;//40天众筹期
     const double  ratio_max = 1.30;//倍数由1.30开始递减,第1天1.30,第2天1.29,...第29天1.01,第30天到第40天1.0
     const double  ratio_min = 1.00;
-    const int64_t days__per_year = 2;//365;
-    const int64_t second_per_day = 60;//24 * 3600;//每天解冻一点
+    const int64_t days__per_year = 365;
+    const int64_t second_per_day = 24 * 3600;//每天解冻一点
     const int64_t reward_partner_base = 50000000;//奖励基线,为他人众筹超过5000EOS才有奖励
     const double  reward_partner_ratio = 0.05;//奖励代投伙伴5%
     const double  reward_team_ratio = 0.1;//奖励开发团队和社区10%
     #define ETB_SYMBOL S(4,ETB)
-
 
     void etbexchange::create()
     {
@@ -35,9 +34,6 @@ namespace etb {
                 s.exchange_expire  = s.create_time + expire_time;
             });
     }
-
-
-
 
     void etbexchange::transfer( account_name from,
                           account_name to,
@@ -95,33 +91,6 @@ namespace etb {
             }
     }
 
-//    void etbexchange::issue( account_name to, asset quantity, string memo )
-//    {
-//        auto sym_name = sym.name();
-//        stats statstable( _self, sym_name );
-//        auto existing = statstable.find( sym_name );
-//        eosio_assert( existing != statstable.end(), "token with symbol does not exist, create token before issue" );
-//        const auto& st = *existing;
-//
-//
-//
-//        eosio_assert( quantity.is_valid(), "invalid quantity" );
-//        eosio_assert( quantity.amount > 0, "must issue positive quantity" );
-//
-//        eosio_assert( quantity.symbol == st.supply.symbol, "symbol precision mismatch" );
-//        eosio_assert( quantity.amount <= st.max_supply.amount - st.supply.amount, "quantity exceeds available supply");
-//
-//        statstable.modify( st, 0, [&]( auto& s ) {
-//            s.supply += quantity;
-//        });
-//
-//        add_balance( st.creater, quantity, st.creater );
-//
-//        if( to != st.creater ) {
-//            SEND_INLINE_ACTION( *this, transfer, {st.creater,N(active)}, {st.creater, to, quantity, memo} );
-//        }
-//    }
-
     void etbexchange::issue( account_name from,
                    account_name to,
                    asset        quantity)
@@ -156,7 +125,7 @@ namespace etb {
                     std::make_tuple(from, _self, quantity, std::string("send EOS"))
             ).send();
 
-            //倍数由1.30开始递减,第1天1.30,第2天1.29,...第29天1.01,第30天到第40天1.0
+            //倍数由1.30开始递减,第1天1.30,第2天1.29,...第29天1.01,第30天之后恒定为1.0
             int64_t days = (now() - st.create_time) / second_per_day;
 //            print("now:",now(),"\n");
 //            print("issue time:",st.create_time, "\n");
@@ -210,9 +179,6 @@ namespace etb {
                         a.exchange_other = asset{0, S(4,EOS)};
                         a.reward = asset{0, ETB_SYMBOL};
                     }
-
-
-
                 });
             } else {
                 owner_exchanges.modify( itr, 0, [&]( auto& a ) {
@@ -253,10 +219,7 @@ namespace etb {
                 });
             }
 
-
-
-            max_supply.amount += to_quant.amount + reward_team.amount + reward_partner.amount;
-
+            max_supply.amount += to_quant.amount + reward_partner.amount + reward_team.amount;
             statstable.modify( existing, 0, [&]( auto& a) {
                 a.max_supply = max_supply;
                 a.supply += to_quant;
@@ -267,31 +230,6 @@ namespace etb {
             if( to != from ) {
                 SEND_INLINE_ACTION( *this, transfer, {from,N(active)}, {from, to, to_quant, std::string("issue ETB")} );
             }
-
-
-            //转出ETB给接收者
-//            action(
-//                    permission_level{ N(etbissue1111), N(active) },
-//                    N(etbico111111), N(issue),
-//                    std::make_tuple(to, to_quant, std::string("issue ETB"))
-//            ).send();
-//
-//            //转出团队奖励,冻结在发币者账户
-//            action(
-//                    permission_level{ N(etbissue1111), N(active) },
-//                    N(etbico111111), N(issue),
-//                    std::make_tuple(st.creater, reward_team, std::string("issue ETB"))
-//            ).send();
-//
-//            //转出合伙人奖励,冻结在发币者账户
-//            if(reward_partner.amount > 0){
-//                action(
-//                        permission_level{ N(etbissue1111), N(active) },
-//                        N(etbico111111), N(issue),
-//                        std::make_tuple(st.creater, reward_partner, std::string("issue ETB"))
-//                ).send();
-//            }
-
     }
 
     void etbexchange::claimrewards( const account_name& owner ){
@@ -330,12 +268,6 @@ namespace etb {
             });
 
             add_balance( owner, reward, owner );
-
-//            action(
-//                    permission_level{ N(etbissue1111), N(active) },
-//                    N(etbico111111), N(issue),
-//                    std::make_tuple(owner, reward, std::string("claimedrewards"))
-//            ).send();
 
             owner_exchanges.modify( itr, 0, [&]( auto& a ) {
                 a.claimedreward.amount += reward.amount;

@@ -2,8 +2,8 @@
 // Created by root1 on 18-7-19.
 //
 
-#ifndef EOSIO_ICO_H
-#define EOSIO_ICO_H
+#ifndef EOSIO_ETB_H
+#define EOSIO_ETB_H
 
 
 /**
@@ -52,7 +52,6 @@ namespace etb {
         struct currency_stats {
             asset          supply;
             asset          max_supply;
-//            account_name   creater;
             uint64_t       create_time;
             uint64_t       exchange_expire;
             uint64_t primary_key()const { return supply.symbol.name(); }
@@ -73,7 +72,6 @@ namespace etb {
         typedef eosio::multi_index<N(stat), currency_stats> stats;
         typedef eosio::multi_index<N(exchanges), exchange_table> exchanges;
 
-//        void issue( account_name to, asset quantity, string memo );
         void sub_balance( account_name owner, asset value );
         void add_balance( account_name owner, asset value, account_name ram_payer );
 
@@ -87,9 +85,9 @@ namespace etb {
     };
 
 
-} /// namespace etb
+}
 
 
 
 
-#endif //EOSIO_ICO_H
+#endif //EOSIO_ETB_H
