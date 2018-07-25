@@ -8,7 +8,8 @@ telegram：https://t.me/etex_official <br>
 
 
 #etbexchange合约说明
-1. 创建ETB代币:create() 
+1. 创建ETB代币:create()  
+功能描述:新建ETB代币,设置最大发币量为0,issue活动期40天
 
 2. 发币:issue( account_name from,account_name to,asset quantity)     
 from: EOS转出账户   
@@ -19,10 +20,11 @@ a 从from转出quantity个EOS到合约账户,quantity必须为整数如1.0000 EO
 b 给接收者发币:quantity\*系数(由第一天1.30每天递减0.01,最后恒定为1.00,即1.30,1.29...1.01,1.00,1.00)个ETB    
 c 合伙人奖励:from不等于to时from有奖励机制,统计from给他人的EOS转出量,如超过5000个EOS,则(1):如之前已超过5000,则奖励:当笔EOS转出量\*(1.30\~1.00)\*5%个ETB(2)如之前未超5000,则奖励:EOS转出总量\*(1.30\~1.00)\*5%个ETB  
 d 团队奖励: 当笔EOS转出量\*(1.30\~1.00)\*10%个ETB    
-e 合伙人奖励和团队奖励冻结在合约账户里面,当活动结束后每天解冻1/365,通过claimrewards索取奖励.
+e 合伙人奖励和团队奖励冻结在合约账户里面,当活动结束后每天解冻:总奖励/365,一年内解冻完毕,可通过claimrewards索取奖励.
 
 3. 领取奖励:claimrewards( const account_name& owner )   
-owner:领取奖励的账户
+owner:领取奖励的账户   
+功能描述:当issue活动结束后,每天解冻:总奖励/365,一年内解冻完毕,每次领取间隔至少一天
 
 4. 转账:transfer( account_name from,account_name to,asset quantity,string memo )  
 from:转出账户   
