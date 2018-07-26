@@ -9,7 +9,7 @@ telegram：https://t.me/etex_official <br>
 
 #etbexchange合约说明
 1. 创建ETB代币:create()  
-功能描述:新建ETB代币,设置最大发币量为0,issue活动期40天
+功能描述:新建ETB代币,设置初始发币量为0,总发币量=所有issue总和,不设上限,issue活动期40天
 
 2. 发币:issue( account_name from,account_name to,asset quantity)     
 from: EOS转出账户   
@@ -42,7 +42,7 @@ memo:备注信息
 
      
 指令:     
-部署合约:cleos set contract etbexchanger /contracts/etbexchange -p etbexchanger
+部署合约:cleos set contract etbexchanger /contracts/etbtoken -p etbexchanger
           
 创建代币:cleos push action etbexchanger create '[]' -p etbexchanger
 
@@ -54,7 +54,7 @@ memo:备注信息
                   
 查看user11111111的奖励:cleos get table etbexchanger etbexchanger exchanges -L user11111111 -l 1
       
-查看所有账户奖励:cleos get table etbexchanger etbexchanger exchanges
+查看所有账户奖励:cleos get table etbexchanger etbexchanger etbinfo
         
 索取奖励:cleos push action etbexchanger claimrewards '["user11111111"]' -p user11111111
              

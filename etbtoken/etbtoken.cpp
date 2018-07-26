@@ -3,7 +3,7 @@
  *  @copyright defined in eos/LICENSE.txt
  */
 
-#include "etbexchange.h"
+#include "etbtoken.h"
 
 namespace etb {
 
@@ -17,7 +17,7 @@ namespace etb {
     const double  reward_team_ratio = 0.1;//奖励开发团队和社区10%
     #define ETB_SYMBOL S(4,ETB)
 
-    void etbexchange::create()
+    void etbtoken::create()
     {
             require_auth( _self );
 
@@ -35,7 +35,7 @@ namespace etb {
             });
     }
 
-    void etbexchange::transfer( account_name from,
+    void etbtoken::transfer( account_name from,
                           account_name to,
                           asset        quantity,
                           string       memo )
@@ -60,7 +60,7 @@ namespace etb {
             add_balance( to, quantity, from );
     }
 
-    void etbexchange::sub_balance( account_name owner, asset value ) {
+    void etbtoken::sub_balance( account_name owner, asset value ) {
             accounts from_acnts( _self, owner );
 
             const auto& from = from_acnts.get( value.symbol.name(), "no balance object found" );
@@ -76,7 +76,7 @@ namespace etb {
             }
     }
 
-    void etbexchange::add_balance( account_name owner, asset value, account_name ram_payer )
+    void etbtoken::add_balance( account_name owner, asset value, account_name ram_payer )
     {
             accounts to_acnts( _self, owner );
             auto to = to_acnts.find( value.symbol.name() );
@@ -91,7 +91,7 @@ namespace etb {
             }
     }
 
-    void etbexchange::issue( account_name from,
+    void etbtoken::issue( account_name from,
                    account_name to,
                    asset        quantity)
     {
@@ -142,28 +142,28 @@ namespace etb {
 //            to_quant.print();
 
             //接收者信息
-            exchanges owner_exchanges(_self, _self);
-            auto itr = owner_exchanges.find( to );
-            if( itr == owner_exchanges.end() ) {
-                owner_exchanges.emplace( from, [&]( auto& a ){
+            etbinfos owner_etbinfos(_self, _self);
+            auto itr = owner_etbinfos.find( to );
+            if( itr == owner_etbinfos.end() ) {
+                owner_etbinfos.emplace( from, [&]( auto& a ){
                     a.name = to;
-                    a.exchange_self = asset{0, S(4,EOS)};
-                    a.exchange_other = asset{0, S(4,EOS)};
+                    a.buyfor_self = asset{0, S(4,EOS)};
+                    a.buyfor_other = asset{0, S(4,EOS)};
                     a.receive = to_quant;
                     a.reward = asset{0, ETB_SYMBOL};
                     a.claimedreward = asset{0, ETB_SYMBOL};
                 });
             } else {
-                owner_exchanges.modify( itr, 0, [&]( auto& a ) {
+                owner_etbinfos.modify( itr, 0, [&]( auto& a ) {
                     a.receive.amount += to_quant.amount;
                 });
             }
 
             //合伙人账户
             asset reward_partner{0,ETB_SYMBOL};
-            itr = owner_exchanges.find( from );
-            if( itr == owner_exchanges.end() ) {
-                owner_exchanges.emplace( from, [&]( auto& a ){
+            itr = owner_etbinfos.find( from );
+            if( itr == owner_etbinfos.end() ) {
+                owner_etbinfos.emplace( from, [&]( auto& a ){
                     a.name = from;
                     a.receive = asset{0, ETB_SYMBOL};
                     a.claimedreward = asset{0, ETB_SYMBOL};
@@ -171,29 +171,29 @@ namespace etb {
                         reward_partner.amount = quantity.amount>=reward_partner_base? int64_t(to_quant.amount*reward_partner_ratio):0;
 //                        reward_partner.print();
 
-                        a.exchange_self = asset{0, S(4,EOS)};
-                        a.exchange_other = quantity;
+                        a.buyfor_self = asset{0, S(4,EOS)};
+                        a.buyfor_other = quantity;
                         a.reward = reward_partner;
                     }else{
-                        a.exchange_self = quantity;
-                        a.exchange_other = asset{0, S(4,EOS)};
+                        a.buyfor_self = quantity;
+                        a.buyfor_other = asset{0, S(4,EOS)};
                         a.reward = asset{0, ETB_SYMBOL};
                     }
                 });
             } else {
-                owner_exchanges.modify( itr, 0, [&]( auto& a ) {
+                owner_etbinfos.modify( itr, 0, [&]( auto& a ) {
                     if(from != to){
-                        if(itr->exchange_other.amount >= reward_partner_base){
+                        if(itr->buyfor_other.amount >= reward_partner_base){
                             reward_partner.amount = int64_t(to_quant.amount * reward_partner_ratio);
-                        }else if(itr->exchange_other.amount + quantity.amount >= reward_partner_base){
-                            reward_partner.amount = int64_t((itr->exchange_other.amount + quantity.amount) * ratio * reward_partner_ratio);
+                        }else if(itr->buyfor_other.amount + quantity.amount >= reward_partner_base){
+                            reward_partner.amount = int64_t((itr->buyfor_other.amount + quantity.amount) * ratio * reward_partner_ratio);
                         }
 //                        reward_partner.print();
 
-                        a.exchange_other.amount += quantity.amount;
+                        a.buyfor_other.amount += quantity.amount;
                         a.reward.amount += reward_partner.amount;
                     }else{
-                        a.exchange_self.amount += quantity.amount;
+                        a.buyfor_self.amount += quantity.amount;
                     }
                 });
             }
@@ -203,18 +203,18 @@ namespace etb {
             asset reward_team{int64_t(to_quant.amount*reward_team_ratio),ETB_SYMBOL};
 //            reward_team.print();
 
-            itr = owner_exchanges.find( _self );
-            if( itr == owner_exchanges.end() ) {
-                owner_exchanges.emplace( _self, [&]( auto& a ){
+            itr = owner_etbinfos.find( _self );
+            if( itr == owner_etbinfos.end() ) {
+                owner_etbinfos.emplace( _self, [&]( auto& a ){
                     a.name = _self;
-                    a.exchange_self = asset{0, S(4,EOS)};
-                    a.exchange_other = asset{0, S(4,EOS)};
+                    a.buyfor_self = asset{0, S(4,EOS)};
+                    a.buyfor_other = asset{0, S(4,EOS)};
                     a.receive = asset{0, ETB_SYMBOL};
                     a.reward = reward_team;
                     a.claimedreward = asset{0, ETB_SYMBOL};
                 });
             } else {
-                owner_exchanges.modify( itr, 0, [&]( auto& a ) {
+                owner_etbinfos.modify( itr, 0, [&]( auto& a ) {
                     a.reward.amount += reward_team.amount;
                 });
             }
@@ -232,7 +232,7 @@ namespace etb {
             }
     }
 
-    void etbexchange::claimrewards( const account_name& owner ){
+    void etbtoken::claimrewards( const account_name& owner ){
 //            print("owner:",name{owner}, "\n");
             require_auth( owner );
 
@@ -245,9 +245,9 @@ namespace etb {
 //            print("issue expire:",existing->exchange_expire,"\n");
             eosio_assert(now() > existing->exchange_expire, "cannot claim rewards until the etbexchange is finished");
 
-            exchanges owner_exchanges(_self, _self);
-            auto itr = owner_exchanges.find( owner );
-            eosio_assert(itr != owner_exchanges.end(), "account does not have rewards");
+            etbinfos owner_etbinfos(_self, _self);
+            auto itr = owner_etbinfos.find( owner );
+            eosio_assert(itr != owner_etbinfos.end(), "account does not have rewards");
             eosio_assert(itr->reward.amount > 0, "claimrewards is zero");
             eosio_assert(itr->reward.amount > itr->claimedreward.amount, "claimedrewards have claimed");
 
@@ -269,7 +269,7 @@ namespace etb {
 
             add_balance( owner, reward, owner );
 
-            owner_exchanges.modify( itr, 0, [&]( auto& a ) {
+            owner_etbinfos.modify( itr, 0, [&]( auto& a ) {
                 a.claimedreward.amount += reward.amount;
                 a.last_claim_time = now();
             });
@@ -280,7 +280,7 @@ namespace etb {
 
 } /// namespace eosio
 
-EOSIO_ABI( etb::etbexchange, (create)(issue)(transfer)(claimrewards) )
+EOSIO_ABI( etb::etbtoken, (create)(issue)(transfer)(claimrewards) )
 
 
 

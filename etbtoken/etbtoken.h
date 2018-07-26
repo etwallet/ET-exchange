@@ -24,9 +24,9 @@ namespace etb {
     using std::string;
 
 
-    class etbexchange : public contract {
+    class etbtoken : public contract {
     public:
-        etbexchange( account_name self ):contract(self){}
+        etbtoken( account_name self ):contract(self){}
 
         void create();
 
@@ -57,10 +57,10 @@ namespace etb {
             uint64_t primary_key()const { return supply.symbol.name(); }
         };
 
-        struct exchange_table{
+        struct etbinfo_table{
             account_name   name;
-            asset  exchange_self;
-            asset  exchange_other;
+            asset  buyfor_self;
+            asset  buyfor_other;
             asset  receive;
             asset  reward;
             asset  claimedreward;
@@ -70,7 +70,7 @@ namespace etb {
 
         typedef eosio::multi_index<N(accounts), account> accounts;
         typedef eosio::multi_index<N(stat), currency_stats> stats;
-        typedef eosio::multi_index<N(exchanges), exchange_table> exchanges;
+        typedef eosio::multi_index<N(etbinfo), etbinfo_table> etbinfos;
 
         void sub_balance( account_name owner, asset value );
         void add_balance( account_name owner, asset value, account_name ram_payer );

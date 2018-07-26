@@ -33,12 +33,12 @@
         {"name":"exchange_expire", "type":"uint64"}
       ]
     },{
-        "name": "exchange_table",
+        "name": "etbinfo_table",
         "base": "",
         "fields": [
           {"name":"name", "type":"account_name"}
-          {"name":"exchange_self", "type":"asset"}
-          {"name":"exchange_other", "type":"asset"}
+          {"name":"buyfor_self", "type":"asset"}
+          {"name":"buyfor_other", "type":"asset"}
           {"name":"receive", "type":"asset"}
           {"name":"reward", "type":"asset"}
           {"name":"claimedreward", "type":"asset"}
@@ -94,8 +94,8 @@
         "key_names" : ["currency"],
         "key_types" : ["uint64"]
       },{
-          "name": "exchanges",
-          "type": "exchange_table",
+          "name": "etbinfo",
+          "type": "etbinfo_table",
           "index_type": "i64",
           "key_names" : ["currency"],
           "key_types" : ["uint64"]
