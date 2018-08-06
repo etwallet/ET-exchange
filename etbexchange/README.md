@@ -92,7 +92,8 @@ cleos get table etbexchanger etbexchanger markets
 ##
 三. 用户交易步骤:  
 用户1:user11111111, 用户2:user22222222, 
-1. 买币(买币前授权eosio.code给合约账号etbexchange1,买币后撤销权限)     
+1. 买币(买币前授权eosio.code给合约账号etbexchange1,买币后撤销权限)              
+
 授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": [{"permission":{"actor":"etbexchanger","permission":"eosio.code"},"weight":1}]}' owner -p user11111111
 
 买TEST币: cleos push action etbexchanger buytoken '["user11111111", "0.1000 EOS", "issuemytoken","4,TEST", "user11111111", "0"]' -p user11111111
@@ -100,6 +101,7 @@ cleos get table etbexchanger etbexchanger markets
 撤销授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": []}' owner -p user11111111
 
 2. 卖币   
+
 授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": [{"permission":{"actor":"etbexchanger","permission":"eosio.code"},"weight":1}]}' owner -p user11111111
 
 卖TEST币: cleos push action etbexchanger selltoken '["user11111111", "issuemytoken","12439024.3889 TEST", "user11111111", "0" ]' -p user11111111
