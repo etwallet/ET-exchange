@@ -1,0 +1,110 @@
+{
+  "version": "eosio::abi/1.0",
+  "types": [{
+      "new_type_name": "account_name",
+      "type": "name"
+    }
+  ],
+  "structs": [{
+      "name": "create",
+      "base": "",
+      "fields": [
+      {"name": "payer","type": "account_name"},
+      {"name": "exchange_account","type": "account_name"},
+      {"name": "eos_supply","type": "asset"}
+      {"name": "token_contract","type": "account_name"},
+      {"name": "token_supply","type": "asset"},
+      ]
+    },{
+       "name": "buytoken",
+       "base": "",
+       "fields": [
+        {"name": "payer","type": "account_name"},
+        {"name": "eos_quant","type": "asset"},
+        {"name": "token_contract","type": "account_name"},
+        {"name": "token_symbol","type": "symbol"},
+        {"name": "fee_account","type": "account_name"},
+        {"name": "fee_rate","type": "int64"}
+       ]
+     },{
+      "name": "selltoken",
+      "base": "",
+      "fields": [
+        {"name": "account","type": "account_name"},
+        {"name": "token_contract","type": "account_name"},
+        {"name": "quant","type": "asset"},
+        {"name": "fee_account","type": "account_name"},
+        {"name": "fee_rate","type": "int64"}
+      ]
+    },{
+      "name": "addtoken",
+      "base": "",
+      "fields": [
+        {"name": "account","type": "account_name"},
+        {"name": "quant","type": "asset"},
+        {"name": "token_contract","type": "account_name"},
+        {"name": "token_symbol","type": "symbol"}
+      ]
+    },{
+        "name": "subtoken",
+        "base": "",
+        "fields": [
+          {"name": "receiver","type": "account_name"},
+          {"name": "quant","type": "asset"},
+          {"name": "token_contract","type": "account_name"},
+          {"name": "token_symbol","type": "symbol"}
+        ]
+      },{
+    "name": "connector",
+    "base": "",
+    "fields": [
+      {"name":"contract", "type":"account_name"},
+      {"name":"balance", "type":"asset"},
+      {"name":"weight", "type":"float64"}
+    ]
+  },{
+    "name": "exchange_state",
+    "base": "",
+    "fields": [
+      {"name":"id", "type":"uint64"},
+      {"name":"idxkey", "type":"uint128"},
+      {"name":"supply", "type":"asset"},
+      {"name":"base", "type":"connector"},
+      {"name":"quote", "type":"connector"},
+      {"name":"exchange_account", "type":"account_name"},
+    ]
+  }
+  ],
+  "actions": [{
+      "name": "create",
+      "type": "create",
+      "ricardian_contract": ""
+    },{
+      "name": "buytoken",
+      "type": "buytoken",
+      "ricardian_contract": ""
+    },{
+      "name": "selltoken",
+      "type": "selltoken",
+      "ricardian_contract": ""
+    },{
+        "name": "addtoken",
+        "type": "addtoken",
+        "ricardian_contract": ""
+    },{
+         "name": "subtoken",
+         "type": "subtoken",
+         "ricardian_contract": ""
+     }
+  ],
+  "tables": [{
+       "name": "markets",
+       "type": "exchange_state",
+       "index_type": "i64",
+       "key_names" : ["supply"],
+       "key_types" : ["uint64"]
+     }
+  ],
+  "ricardian_clauses": [],
+  "abi_extensions": []
+}
