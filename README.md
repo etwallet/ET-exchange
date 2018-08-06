@@ -1,54 +1,45 @@
-# ET-exchange
-基于EOS的去中心化交易平台<br>
-
-[ET开放式去中心化交易平台白皮书](https://github.com/eostoken/ET-exchange/blob/master/WhitePaper.md)
-
-telegram：https://t.me/etex_official <br>
-微信：tao709308469
-
-
 一. 合约接口说明:
 
-1. 创建代币交易池:
+1. 创建代币bancor池:
 void create(account_name payer, account_name exchange_account, asset eos_supply, account_name  token_contract,  asset token_supply);    
-payer:			支付账号,从这个账号转出代币和EOS到交易池账号    
-exchange_account:	交易池账号,ETB代币和EOS代币都在此账号名下:如:exchangeacc1     
+payer:			支付账号,从这个账号转出代币和EOS到bancor池账号    
+exchange_account:	bancor池账号,TEST代币和EOS代币都在此账号名下:如:etbexchange1     
 eos_supply:		初始化EOS数量:如: 100000.0000 EOS     
-token_contract: 	代币属于哪个合约,如:etbico111111部署创建了ETB代币       
-token_supply:		初始化代币数量:如:1000000.0000 ETB代币    
+token_contract: 	代币属于哪个合约,如:issuemytoken部署创建了TEST代币       
+token_supply:		初始化代币数量:如:1000000.0000 TEST代币    
 
 2. 买代币
 void buytoken( account_name payer, asset eos_quant,account_name token_contract, symbol_type token_symbol, account_name fee_account,int64_t fee_rate);   
 payer: 	买币账号    
 eos_quant:		用quant个EOS购买代币  
-token_contract: 	代币属于哪个合约,如ETB代币是etbico111111部署创建的   
-token_symbol:		想要购买的代币符号:如ETB  
+token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的   
+token_symbol:		想要购买的代币符号:如TEST  
 fee_account:		收取手续费的账号    
 fee_rate:		手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费   
 
 3. 卖代币
 void selltoken( account_name receiver, account_name token_contract, asset quant ,account_name fee_account,int64_t fee_rate);    
 receiver: 		卖币账号,接收EOS  
-token_contract: 	代币属于哪个合约,如ETB代币是etbico111111部署创建的   
+token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的   
 quant:			想要卖出的quant个代币   
 fee_account:		收取手续费的账号    
 fee_rate:		手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费   
 
-4. 增加交易池的代币量
+4. 增加bancor池的代币量
 void exchange::addtoken( account_name account,asset quant, account_name token_contract,symbol_type token_symbol )   
-account:		支付账号,从这个账号转出当前市场价格的代币和EOS到交易池账号中    
+account:		支付账号,从这个账号转出当前市场价格的代币和EOS到bancor池账号中    
 quant:			新增的EOS量         
-token_contract: 	代币属于哪个合约,如ETB代币是etbico111111部署创建的         
+token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的         
 token_symbol:		新增的代币符号 
-例如:当前市场1EOS可以买到10个ETB,那么增加1000个EOS时,会从account转出1000个EOS和10000个ETB到交易池中  
+例如:当前市场1EOS可以买到10个TEST,那么增加1000个EOS时,会从account转出1000个EOS和10000个TEST到bancor池中  
 
-5. 减少交易池的代币量
+5. 减少bancor池的代币量
 void exchange::subtoken( account_name account, asset quant, account_name token_contract,symbol_type token_symbol )       
 account:		支付账号,向这个账号转入当前市场价格的代币和EOS   
 quant:			减少的EOS量     
-token_contract: 	代币属于哪个合约,如ETB代币是etbico111111部署创建的       
+token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的       
 token_symbol		减少的代币符号     
-例如:当前市场1EOS可以买到10个ETB,那么减少1000个EOS时,会从交易池中转出1000个EOS和10000个ETB到account中
+例如:当前市场1EOS可以买到10个TEST,那么减少1000个EOS时,会从bancor池中转出1000个EOS和10000个TEST到account中
 
 ##
 二. 交易所操作步骤:合约账号:etbexchanger,用于创建交易所;(可在主网上查看)
@@ -56,13 +47,13 @@ token_symbol		减少的代币符号
 1. 部署交易所合约  
 eg: cleos  set contract etbexchanger /eos/contracts/etbexchange -p etbexchanger
 
-2. 创建ETB和USD代币交易池:  
+2. 创建TEST代币bancor池:  
   
 先授权给合约:     
 cleos set account permission etbexchanger active '{"threshold": 1,"keys": [{"key": "EOS6mBLtJQv5Adv36dDkvWtPP7bqUNArwWXiZCT8711CUBPBTbdnR","weight": 1}],"accounts": [{"permission":{"actor":"etbexchanger","permission":"eosio.code"},"weight":1}]}' owner -p etbexchanger
 
-从etbexchanger中转出4个EOS和100000000个TEST币到交易池etbexchange1中:   
-cleos  push action etbexchange1 create '["etbexchanger","etbexchange1", "4.0000 EOS","issuemytoken","100000000.0000 TEST"]' -p etbexchanger
+从etbexchanger中转出4个EOS和100000000个TEST币到bancor池etbexchange1中:   
+cleos  push action etbexchanger create '["etbexchanger","etbexchange1", "4.0000 EOS","issuemytoken","100000000.0000 TEST"]' -p etbexchanger
 
 撤销授权:       
 cleos set account permission etbexchanger active '{"threshold": 1,"keys": [{"key": "EOS6mBLtJQv5Adv36dDkvWtPP7bqUNArwWXiZCT8711CUBPBTbdnR","weight": 1}],"accounts": []}' owner -p etbexchanger
@@ -102,7 +93,7 @@ cleos get table etbexchanger etbexchanger markets
 2. 卖币   
 授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": [{"permission":{"actor":"etbexchanger","permission":"eosio.code"},"weight":1}]}' owner -p user11111111
 
-卖ETB币: cleos push action etbexchanger selltoken '["user11111111", "issuemytoken","12439024.3889 TEST", "user11111111", "0" ]' -p user11111111
+卖TEST币: cleos push action etbexchanger selltoken '["user11111111", "issuemytoken","12439024.3889 TEST", "user11111111", "0" ]' -p user11111111
 
 撤销授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": []}' owner -p user11111111
 
