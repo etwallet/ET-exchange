@@ -9,7 +9,7 @@ telegram：https://t.me/etex_official <br>
 
 一. 合约接口说明:
 
-1. 创建代币bancor池:
+1. 创建代币bancor池:     
 void create(account_name payer, account_name exchange_account, asset eos_supply, account_name  token_contract,  asset token_supply);    
 payer:			支付账号,从这个账号转出代币和EOS到bancor池账号    
 exchange_account:	bancor池账号,TEST代币和EOS代币都在此账号名下:如:etbexchange1     
@@ -17,7 +17,7 @@ eos_supply:		初始化EOS数量:如: 100000.0000 EOS
 token_contract: 	代币属于哪个合约,如:issuemytoken部署创建了TEST代币       
 token_supply:		初始化代币数量:如:1000000.0000 TEST代币    
 
-2. 买代币
+2. 买代币  
 void buytoken( account_name payer, asset eos_quant,account_name token_contract, symbol_type token_symbol, account_name fee_account,int64_t fee_rate);   
 payer: 	买币账号    
 eos_quant:		用quant个EOS购买代币  
@@ -26,7 +26,7 @@ token_symbol:		想要购买的代币符号:如TEST
 fee_account:		收取手续费的账号    
 fee_rate:		手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费   
 
-3. 卖代币
+3. 卖代币  
 void selltoken( account_name receiver, account_name token_contract, asset quant ,account_name fee_account,int64_t fee_rate);    
 receiver: 		卖币账号,接收EOS  
 token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的   
@@ -34,7 +34,7 @@ quant:			想要卖出的quant个代币
 fee_account:		收取手续费的账号    
 fee_rate:		手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费   
 
-4. 增加bancor池的代币量
+4. 增加bancor池的代币量    
 void exchange::addtoken( account_name account,asset quant, account_name token_contract,symbol_type token_symbol )   
 account:		支付账号,从这个账号转出当前市场价格的代币和EOS到bancor池账号中    
 quant:			新增的EOS量         
@@ -42,12 +42,12 @@ token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创�
 token_symbol:		新增的代币符号 
 例如:当前市场1EOS可以买到10个TEST,那么增加1000个EOS时,会从account转出1000个EOS和10000个TEST到bancor池中  
 
-5. 减少bancor池的代币量
+5. 减少bancor池的代币量    
 void exchange::subtoken( account_name account, asset quant, account_name token_contract,symbol_type token_symbol )       
 account:		支付账号,向这个账号转入当前市场价格的代币和EOS   
 quant:			减少的EOS量     
 token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的       
-token_symbol		减少的代币符号     
+token_symbol:		减少的代币符号     
 例如:当前市场1EOS可以买到10个TEST,那么减少1000个EOS时,会从bancor池中转出1000个EOS和10000个TEST到account中
 
 ##
