@@ -4,8 +4,8 @@
 [ET开放式去中心化交易平台白皮书](https://github.com/eostoken/ET-exchange/blob/master/WhitePaper.md)
 
 telegram：https://t.me/etex_official <br>
-微信：tao709308469
-
+微信：tao709308469 <br><br>
+![etlogo](https://github.com/eostoken/ET-exchange/blob/master/picture/lo1.png)
 ##
 一. 合约接口说明:
 1. 创建代币bancor池:     
