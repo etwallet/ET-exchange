@@ -7,6 +7,7 @@
 
 #pragma once
 
+
 #include <eosio.system/native.hpp>
 #include <eosiolib/asset.hpp>
 #include <eosiolib/time.hpp>
@@ -15,6 +16,7 @@
 #include <eosiolib/eosio.hpp>
 #include "exchange_state.hpp"
 #include <string>
+
 
 namespace etb {
     using namespace eosio;

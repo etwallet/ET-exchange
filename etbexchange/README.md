@@ -6,9 +6,8 @@
 telegram：https://t.me/etex_official <br>
 微信：tao709308469
 
-
+##
 一. 合约接口说明:
-
 1. 创建代币bancor池:     
 void create(account_name payer, account_name exchange_account, asset eos_supply, account_name  token_contract,  asset token_supply);    
 payer:			支付账号,从这个账号转出代币和EOS到bancor池账号    
@@ -53,10 +52,14 @@ token_symbol:		减少的代币符号
 ##
 二. 交易所操作步骤:合约账号:etbexchanger,用于创建交易所;(可在主网上查看)
 
-1. 部署交易所合约  
+1.编译合约      
+eosiocpp -o /eos/contracts/etbexchange/etbexchange.wast  /eos/contracts/etbexchange/etbexchange.cpp /eos/contracts/etbexchange/exchange_state.cpp       
+eosiocpp -g /eos/contracts/etbexchange/etbexchange.api  /eos/contracts/etbexchange/etbexchange.cpp
+
+2. 部署交易所合约  
 eg: cleos  set contract etbexchanger /eos/contracts/etbexchange -p etbexchanger
 
-2. 创建TEST代币bancor池:  
+3. 创建TEST代币bancor池:  
   
 先授权给合约:     
 cleos set account permission etbexchanger active '{"threshold": 1,"keys": [{"key": "EOS6mBLtJQv5Adv36dDkvWtPP7bqUNArwWXiZCT8711CUBPBTbdnR","weight": 1}],"accounts": [{"permission":{"actor":"etbexchanger","permission":"eosio.code"},"weight":1}]}' owner -p etbexchanger
@@ -67,7 +70,7 @@ cleos  push action etbexchanger create '["etbexchanger","etbexchange1", "4.0000 
 撤销授权:       
 cleos set account permission etbexchanger active '{"threshold": 1,"keys": [{"key": "EOS6mBLtJQv5Adv36dDkvWtPP7bqUNArwWXiZCT8711CUBPBTbdnR","weight": 1}],"accounts": []}' owner -p etbexchanger
 
-3. 查看交易所的币交易情况:     
+4. 查看交易所的币交易情况:     
 cleos get table etbexchanger etbexchanger markets       
 {   
   "rows": [{    

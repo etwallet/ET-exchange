@@ -8,6 +8,13 @@ namespace etb {
     using namespace eosio;
     const int64_t  max_fee_rate = 10000;
 
+    /*  创建代币bancor池
+     *  payer:			    支付账号,从这个账号转出代币和EOS到bancor池账号
+     *  exchange_account:	bancor池账号,TEST代币和EOS代币都在此账号名下:如:etbexchange1
+     *  eos_supply:		    初始化EOS数量:如: 100000.0000 EOS
+     *  token_contract: 	代币属于哪个合约,如:issuemytoken部署创建了TEST代币
+     *  token_supply:		初始化代币数量:如:1000000.0000 TEST代币
+    */
     void exchange::create(account_name payer, account_name exchange_account, asset eos_supply, account_name  token_contract,  asset token_supply)
     {
         require_auth( _self );
@@ -18,12 +25,12 @@ namespace etb {
         eosio_assert(eos_supply.amount > 0, "invalid eos_supply amount");
         eosio_assert(eos_supply.symbol == S(4,EOS), "eos_supply symbol only support EOS");
 
-//        print("\n","token_contract:",name{token_contract},",exchange_account:",name{exchange_account});
-//        print("\n","token_supply:");
-//        token_supply.print();
-//        print("\n","eos_supply");
-//        eos_supply.print();
-//        token_supply.symbol.print();
+        print("\n","token_contract:",name{token_contract},",exchange_account:",name{exchange_account});
+        print("\n","token_supply:");
+        token_supply.print();
+        print("\n","eos_supply");
+        eos_supply.print();
+        token_supply.symbol.print();
 
         markets _market(_self,_self);
 
@@ -63,7 +70,14 @@ namespace etb {
     }
 
 
-
+    /*  购买代币
+     *  payer: 	            买币账号
+     *  eos_quant:		    用quant个EOS购买代币
+     *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
+     *  token_symbol:		想要购买的代币符号:如TEST
+     *  fee_account:		收取手续费的账号,payer==fee_account相当于无手续费
+     *  fee_rate:		    手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费
+     * */
     void exchange::buytoken( account_name payer, asset eos_quant,account_name token_contract, symbol_type token_symbol, account_name fee_account,int64_t fee_rate){
         require_auth( payer );
 
@@ -74,6 +88,7 @@ namespace etb {
 //        token_symbol.print();
 //        print("\n","fee_account:",name{fee_account});
 //        print("\n", fee_rate);
+
 
         eosio_assert(eos_quant.amount > 0, "must purchase a positive amount" );
         eosio_assert(eos_quant.symbol == S(4, EOS), "eos_quant symbol must be EOS");
@@ -90,10 +105,7 @@ namespace etb {
         auto fee = eos_quant;
         auto quant_after_fee = eos_quant;
 
-        if(payer == fee_account){
-            fee_rate = 0;
-        }
-        if(fee_rate > 0){
+        if(payer != fee_account && fee_rate > 0){
             fee.amount = fee.amount * fee_rate / max_fee_rate; /// 万分之fee_rate
             if(fee.amount < 1) fee.amount = 1;//最少万分之一
             quant_after_fee.amount -= fee.amount;
@@ -139,7 +151,13 @@ namespace etb {
 
     }
 
-
+    /*  卖代币
+     *  receiver: 		    卖币账号,接收EOS
+     *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
+     *  quant:			    想要卖出的quant个代币
+     *  fee_account:		收取手续费的账号,receiver==fee_account相当于无手续费
+     *  fee_rate:		    手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费
+     * */
     void exchange::selltoken( account_name receiver, account_name token_contract, asset quant ,account_name fee_account,int64_t fee_rate){
         require_auth( receiver );
 //        print("\n","fee_account:",name{fee_account});
@@ -176,8 +194,7 @@ namespace etb {
                 std::make_tuple(market.exchange_account, receiver, tokens_out, std::string("send EOS to user") )
         ).send();
 
-
-        if(fee_rate > 0){
+        if(receiver != fee_account && fee_rate > 0){
             auto fee = tokens_out;
 
             fee.amount = tokens_out.amount * fee_rate / max_fee_rate; /// 万分之fee_rate
@@ -193,7 +210,12 @@ namespace etb {
 
     }
 
-
+    /*  增加bancor池的代币量
+     *  account:		    支付账号,从这个账号转出当前市场价格的代币和EOS到bancor池账号中
+     *  quant:			    新增的EOS量
+     *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
+     *  token_symbol:		新增的代币符号
+     * */
     void exchange::addtoken( account_name account,asset quant, account_name token_contract,symbol_type token_symbol ) {
         require_auth( account );
 
@@ -240,6 +262,12 @@ namespace etb {
 //        market.quote.balance.print();
     }
 
+    /*  减少bancor池的代币量
+     *  account:		    支付账号,向这个账号转入当前市场价格的代币和EOS
+     *  quant:			    减少的EOS量
+     *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
+     *  token_symbol:		减少的代币符号
+     * */
     void exchange::subtoken( account_name account, asset quant, account_name token_contract,symbol_type token_symbol ) {
         require_auth( _self );
 

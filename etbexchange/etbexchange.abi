@@ -30,7 +30,7 @@
       "name": "selltoken",
       "base": "",
       "fields": [
-        {"name": "account","type": "account_name"},
+        {"name": "receiver","type": "account_name"},
         {"name": "token_contract","type": "account_name"},
         {"name": "quant","type": "asset"},
         {"name": "fee_account","type": "account_name"},
