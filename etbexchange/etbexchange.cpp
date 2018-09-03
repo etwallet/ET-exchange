@@ -25,12 +25,12 @@ namespace etb {
         eosio_assert(eos_supply.amount > 0, "invalid eos_supply amount");
         eosio_assert(eos_supply.symbol == S(4,EOS), "eos_supply symbol only support EOS");
 
-        print("\n","token_contract:",name{token_contract},",exchange_account:",name{exchange_account});
-        print("\n","token_supply:");
-        token_supply.print();
-        print("\n","eos_supply");
-        eos_supply.print();
-        token_supply.symbol.print();
+//        print("\n","token_contract:",name{token_contract},",exchange_account:",name{exchange_account});
+//        print("\n","token_supply:");
+//        token_supply.print();
+//        print("\n","eos_supply");
+//        eos_supply.print();
+//        token_supply.symbol.print();
 
         markets _market(_self,_self);
 
@@ -74,7 +74,7 @@ namespace etb {
      *  payer: 	            买币账号
      *  eos_quant:		    用quant个EOS购买代币
      *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
-     *  token_symbol:		想要购买的代币符号:如TEST
+     *  token_symbol:		想要购买的代币符号:如"4,TEST",4是发币的小数点位数
      *  fee_account:		收取手续费的账号,payer==fee_account相当于无手续费
      *  fee_rate:		    手续费率:[0,10000),如:50等同于万分之50; 0等同于无手续费
      * */
