@@ -25,13 +25,6 @@ namespace etb {
         eosio_assert(eos_supply.amount > 0, "invalid eos_supply amount");
         eosio_assert(eos_supply.symbol == S(4,EOS), "eos_supply symbol only support EOS");
 
-//        print("\n","token_contract:",name{token_contract},",exchange_account:",name{exchange_account});
-//        print("\n","token_supply:");
-//        token_supply.print();
-//        print("\n","eos_supply");
-//        eos_supply.print();
-//        token_supply.symbol.print();
-
         markets _market(_self,_self);
 
         uint128_t idxkey = (uint128_t(token_contract) << 64) | token_supply.symbol.value;;
@@ -81,15 +74,6 @@ namespace etb {
     void exchange::buytoken( account_name payer, asset eos_quant,account_name token_contract, symbol_type token_symbol, account_name fee_account,int64_t fee_rate){
         require_auth( payer );
 
-//        print("\n","payer:",name{payer});
-//        print("\n","eos_quant symbol:");
-//        eos_quant.print();
-//        print("\n","token_symbol:");
-//        token_symbol.print();
-//        print("\n","fee_account:",name{fee_account});
-//        print("\n", fee_rate);
-
-
         eosio_assert(eos_quant.amount > 0, "must purchase a positive amount" );
         eosio_assert(eos_quant.symbol == S(4, EOS), "eos_quant symbol must be EOS");
         eosio_assert(token_symbol.is_valid(), "invalid token_symbol");
@@ -106,24 +90,19 @@ namespace etb {
         auto quant_after_fee = eos_quant;
 
         if(payer != fee_account && fee_rate > 0){
-            fee.amount = fee.amount * fee_rate / max_fee_rate; /// 万分之fee_rate
+            fee = fee * fee_rate / max_fee_rate; /// 万分之fee_rate,fee 是 asset已经防止溢出
             if(fee.amount < 1) fee.amount = 1;//最少万分之一
-            quant_after_fee.amount -= fee.amount;
+            quant_after_fee -= fee;
         }else{
             fee.amount = 0;
         }
 
         eosio_assert( quant_after_fee.amount > 0, "quant_after_fee must a positive amount" );
 
-//        print("\n","fee:");
-//        fee.print();
-//        print("\n","quant_after_fee:");
-//        quant_after_fee.print();
-
         action(//给交易所账户转入EOS
                 permission_level{ payer, N(active) },
                 market.quote.contract, N(transfer),
-                std::make_tuple(payer, market.exchange_account, quant_after_fee, std::string("send EOS to contract"))
+                std::make_tuple(payer, market.exchange_account, quant_after_fee, std::string("send EOS to ET"))
         ).send();
 
 
@@ -132,7 +111,7 @@ namespace etb {
             action(
                     permission_level{ payer, N(active) },
                     market.quote.contract, N(transfer),
-                    std::make_tuple(payer, fee_account, fee, std::string("send EOS fee to contract"))
+                    std::make_tuple(payer, fee_account, fee, std::string("send EOS fee to fee_account"))
             ).send();
         }
 
@@ -145,10 +124,8 @@ namespace etb {
         action(//交易所账户转出代币
                 permission_level{ market.exchange_account, N(active) },
                 market.base.contract, N(transfer),
-                std::make_tuple(market.exchange_account, payer, token_out, std::string("send token to user"))
+                std::make_tuple(market.exchange_account, payer, token_out, std::string("receive token from ET"))
         ).send();
-
-
     }
 
     /*  卖代币
@@ -160,8 +137,6 @@ namespace etb {
      * */
     void exchange::selltoken( account_name receiver, account_name token_contract, asset quant ,account_name fee_account,int64_t fee_rate){
         require_auth( receiver );
-//        print("\n","fee_account:",name{fee_account});
-//        print("\n", fee_rate);
 
         eosio_assert(quant.symbol.is_valid(), "invalid token_symbol");
         eosio_assert(quant.symbol != S(4, EOS), "eos_quant symbol must not be EOS");
@@ -185,19 +160,19 @@ namespace etb {
         action(//向交易所账户转入代币
                 permission_level{ receiver, N(active) },
                 market.base.contract, N(transfer),
-                std::make_tuple(receiver, market.exchange_account, quant, std::string("send token to contract") )
+                std::make_tuple(receiver, market.exchange_account, quant, std::string("send token to ET") )
         ).send();
 
         action(//交易所账户转出EOS
                 permission_level{ market.exchange_account, N(active) },
                 market.quote.contract, N(transfer),
-                std::make_tuple(market.exchange_account, receiver, tokens_out, std::string("send EOS to user") )
+                std::make_tuple(market.exchange_account, receiver, tokens_out, std::string("receive EOS from ET") )
         ).send();
 
         if(receiver != fee_account && fee_rate > 0){
             auto fee = tokens_out;
 
-            fee.amount = tokens_out.amount * fee_rate / max_fee_rate; /// 万分之fee_rate
+            fee = tokens_out * fee_rate / max_fee_rate; /// 万分之fee_rate, tokens_out 是 asset已经防止溢出
             if(fee.amount < 1) fee.amount = 1;//最少万分之一
 
             action(//向小费账户转入EOS手续费
@@ -216,17 +191,11 @@ namespace etb {
      *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
      *  token_symbol:		新增的代币符号
      * */
-    void exchange::addtoken( account_name account,asset quant, account_name token_contract,symbol_type token_symbol ) {
+    void exchange::addtoken( account_name account,asset eos_quant, account_name token_contract,symbol_type token_symbol ) {
         require_auth( account );
 
-//        print("\n","account:",name{account});
-//        print("\n","quant symbol:");
-//        quant.print();
-//        print("\n","token_symbol:");
-//        token_symbol.print();
-
-        eosio_assert(quant.amount > 0, "must purchase a positive amount" );
-        eosio_assert(quant.symbol == S(4, EOS), "quant symbol must be EOS");
+        eosio_assert(eos_quant.amount > 0, "must purchase a positive amount" );
+        eosio_assert(eos_quant.symbol == S(4, EOS), "eos_quant symbol must be EOS");
         eosio_assert(token_symbol.is_valid(), "invalid token_symbol");
 
         markets _market(_self,_self);
@@ -235,31 +204,25 @@ namespace etb {
         auto idx = _market.template get_index<N(idxkey)>();
         auto market = idx.get(idxkey,"token market does not exist");
 
-        int64_t token_out = (market.base.balance.amount * quant.amount) / market.quote.balance.amount;
-        eosio_assert(token_out > 0 && (quant.amount == (token_out*market.quote.balance.amount)/market.base.balance.amount) , "token_out must reserve a positive amount");
-        eosio_assert((quant.amount == (token_out*market.quote.balance.amount)/market.base.balance.amount) , "multiplication underflow");
+        asset token_out = (market.base.balance * eos_quant.amount) / market.quote.balance.amount;//market.base.balance, 是 asset已经防止溢出
+        eosio_assert(token_out.amount > 0 , "token_out must reserve a positive amount");
 
         action(//给交易所账户转入EOS
                 permission_level{ account, N(active) },
                 market.quote.contract, N(transfer),
-                std::make_tuple(account, market.exchange_account, quant, std::string("add EOS to contract"))
+                std::make_tuple(account, market.exchange_account, eos_quant, std::string("add EOS to ET"))
         ).send();
 
         action(//给交易所账户转入token
                 permission_level{ account, N(active) },
                 market.base.contract, N(transfer),
-                std::make_tuple(account, market.exchange_account, asset{token_out, token_symbol}, std::string("add token to contract"))
+                std::make_tuple(account, market.exchange_account, token_out, std::string("add token to ET"))
         ).send();
 
         _market.modify( market, 0, [&]( auto& es ) {
-            es.quote.balance.amount += quant.amount;
-            es.base.balance.amount += token_out;
+            es.quote.balance += eos_quant;//是 asset已经防止溢出
+            es.base.balance += token_out;//是 asset已经防止溢出
         });
-
-//        print("\nbase.balance:");
-//        market.base.balance.print();
-//        print("\nquote.balance:");
-//        market.quote.balance.print();
     }
 
     /*  减少bancor池的代币量
@@ -268,18 +231,12 @@ namespace etb {
      *  token_contract: 	代币属于哪个合约,如TEST代币是issuemytoken部署创建的
      *  token_symbol:		减少的代币符号
      * */
-    void exchange::subtoken( account_name account, asset quant, account_name token_contract,symbol_type token_symbol ) {
+    void exchange::subtoken( account_name account, asset eos_quant, account_name token_contract,symbol_type token_symbol ) {
         require_auth( _self );
 
-//        print("\n","account:",name{account});
-//        print("\n","quant symbol:");
-//        quant.print();
-//        print("\n","token_symbol:");
-//        token_symbol.print();
-
-        eosio_assert(quant.amount > 0, "must purchase a positive amount" );
-        eosio_assert(quant.symbol.is_valid(), "invalid quant symbol");
-        eosio_assert(quant.symbol == S(4, EOS), "quant symbol must be EOS");
+        eosio_assert(eos_quant.amount > 0, "must purchase a positive amount" );
+        eosio_assert(eos_quant.symbol.is_valid(), "invalid eos_quant symbol");
+        eosio_assert(eos_quant.symbol == S(4, EOS), "eos_quant symbol must be EOS");
 
         markets _market(_self,_self);
         uint128_t idxkey = (uint128_t(token_contract) << 64) | token_symbol.value;;
@@ -287,38 +244,43 @@ namespace etb {
         auto idx = _market.template get_index<N(idxkey)>();
         auto market = idx.get(idxkey,"token market does not exist");
 
-        eosio_assert(quant.amount <= market.quote.balance.amount, "quant should less than market.quote.balance");
 
-        double base=market.base.balance.amount, quote=market.quote.balance.amount, quant_tmp=quant.amount;
+        int64_t token_out = 0;
+        //大于交易池的总量,表示取消该交易池
+        if (eos_quant > market.quote.balance) {
+            eos_quant = market.quote.balance;
+            token_out = market.base.balance.amount;
+        } else {
+            double base = market.base.balance.amount, quote = market.quote.balance.amount, quant_tmp = eos_quant.amount;
 
-        int64_t token_out = (base * quant_tmp) / quote;
+            token_out = (base * quant_tmp) / quote;
 
-//        print("\ntoken_out:",token_out);
-        eosio_assert(token_out <= market.base.balance.amount, "token_out should less than market.base.balance");
-        eosio_assert(token_out > 0, "token_out must reserve a positive amount");
+            eosio_assert(token_out < market.base.balance.amount, "token_out should less than market.base.balance");
+            eosio_assert(token_out > 0, "token_out must reserve a positive amount");
 
-        if(token_out != market.base.balance.amount){
-            //减少资金池后,要保证币价波动小于等于万分之一: |base/quote - (base-token_out)/(quote-quant)| / (base/quote) <= 1/10000
-            eosio_assert(std::fabs(base/quote - (base - token_out)/(quote - quant_tmp))/(base/quote) <= 0.0001,"ratio before and after should less than or equal to 1/10000");
+                //减少资金池后,要保证币价波动小于等于万分之一: |base/quote - (base-token_out)/(quote-eos_quant)| / (base/quote) <= 1/10000
+            eosio_assert(
+                        std::fabs(base / quote - (base - token_out) / (quote - quant_tmp)) / (base / quote) <= 0.0001,
+                        "ratio before and after should less than or equal to 1/10000");
         }
 
         action(//交易所账户转出EOS
                 permission_level{ market.exchange_account, N(active) },
                 market.quote.contract, N(transfer),
-                std::make_tuple( market.exchange_account, account, quant, std::string("add EOS to account"))
+                std::make_tuple( market.exchange_account, account, eos_quant, std::string("receive EOS from ET"))
         ).send();
 
         action(//交易所账户转出token
                 permission_level{ market.exchange_account, N(active) },
                 market.base.contract, N(transfer),
-                std::make_tuple(market.exchange_account, account, asset{token_out, token_symbol}, std::string("add token to account"))
+                std::make_tuple(market.exchange_account, account, asset{token_out, token_symbol}, std::string("receive token from ET"))
         ).send();
 
         if(token_out == market.base.balance.amount){//全部取走,相当于取消该币的交易市场
             _market.erase(market);
         }else{
             _market.modify( market, 0, [&]( auto& es ) {
-                es.quote.balance.amount -= quant.amount;
+                es.quote.balance -= eos_quant;
                 es.base.balance.amount -= token_out;
             });
         }

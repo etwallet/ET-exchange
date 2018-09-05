@@ -37,9 +37,9 @@ namespace etb {
 
         void selltoken(account_name receiver,account_name token_contract, asset quant ,account_name fee_account,int64_t fee_rate);
 
-        void addtoken( account_name account,asset quant,account_name token_contract, symbol_type token_symbol );
+        void addtoken( account_name account,asset eos_quant,account_name token_contract, symbol_type token_symbol );
 
-        void subtoken( account_name account,asset quant,account_name token_contract, symbol_type token_symbol );
+        void subtoken( account_name account,asset eos_quant,account_name token_contract, symbol_type token_symbol );
 
     };
 
