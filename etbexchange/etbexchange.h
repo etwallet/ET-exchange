@@ -41,8 +41,20 @@ namespace etb {
 
         void subtoken( account_name account,asset quant,account_name token_contract, symbol_type token_symbol );
 
-    };
+        void setparam(account_name token_contract,symbol_type token_symbol, string paramname, string param);
 
+        void pause();
+
+        void restart();
+
+
+    private:
+        asset calcfee(asset quant, uint64_t fee_rate);
+
+        void statsfee(exchange_state &market, asset eos_fee, asset token_fee);
+
+        string to_string(asset quant);
+    };
 
 }
 #endif //EOSIO_ETBEXCHANGE_H

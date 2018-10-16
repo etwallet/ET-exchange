@@ -8,7 +8,7 @@ namespace etb {
 
       real_type R(supply.amount);
       real_type C(c.balance.amount+in.amount);
-      real_type F(c.weight/1000.0);
+      real_type F(c.weight);
       real_type T(in.amount);
       real_type ONE(1.0);
 
@@ -27,7 +27,7 @@ namespace etb {
 
       real_type R(supply.amount - in.amount);
       real_type C(c.balance.amount);
-      real_type F(1000.0/c.weight);
+      real_type F(1.0/c.weight);
       real_type E(in.amount);
       real_type ONE(1.0);
 
