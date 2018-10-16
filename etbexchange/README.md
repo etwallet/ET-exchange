@@ -4,8 +4,8 @@
 [ET开放式去中心化交易平台白皮书](https://github.com/eostoken/ET-exchange/blob/master/WhitePaper.md)
 
 telegram：https://t.me/etex_official <br>
-微信：tao709308469
-
+微信：tao709308469 <br><br>
+![etlogo](https://github.com/eostoken/ET-exchange/blob/master/picture/lo1.png)
 ##
 一. 合约接口说明:
 1. 创建代币bancor池:     
@@ -159,4 +159,5 @@ cleos get table etbexchanger etbexchanger shareholders
 卖TEST币: cleos push action etbexchanger subtoken '["user11111111", "0.0000 EOS","issuemytoken", "4,TEST" ]' -p user11111111
 
 撤销授权: cleos  set account permission user11111111 active '{"threshold": 1,"keys": [{"key": "EOS5EwrHc3V4aFjL2ADV9X246yoZgyFdpKj4spKxq3GJBhETndJum","weight": 1}],"accounts": []}' owner -p user11111111
+
 
